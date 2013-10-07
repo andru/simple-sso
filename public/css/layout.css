@@ -1,0 +1,48 @@
+/* 
+    Document   : layout.css
+    Created on : 27/02/2011, 1:53:50 PM
+    Author     : marcin
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+p{
+   font-family: Georgia,'Times New Roman',times,serif;
+   font-size: 16px;
+}
+
+.errors{
+  padding:5px;
+  color:Red;
+}
+
+.user-profile {
+    width:300px;
+    background-color: #f0f0f0;
+}
+
+.user-gravatar {
+    width:100px;
+}
+
+.identity {  
+  
+    color: #575757;
+   
+}
+#main{
+
+    min-height:300px;
+
+}
+
+
+.message-view{
+  text-align: center;
+  padding:10px;
+}

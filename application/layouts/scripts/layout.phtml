@@ -1,0 +1,47 @@
+<?php 
+$masthead = new PracticalPlants_Masthead();
+echo $this->doctype(); ?>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		
+		<?php 
+		echo $this->headTitle();
+		
+		$masthead->headTags();
+
+		$this->headLink()->appendStylesheet($this->baseUrl('/design/css/default.css'));
+			
+        $this->headLink()->appendStylesheet($this->baseUrl('/css/layout.css'));
+        $this->headLink()->appendStylesheet($this->baseUrl('/css/openid.css'));
+
+        echo $this->headLink();
+
+        $this->headScript()->appendFile($this->baseUrl('/js/openid-jquery.js'));
+        $this->headScript()->appendFile($this->baseUrl('/js/openid-en.js'));
+ 
+        echo $this->headScript();
+			        
+		echo $this->headMeta();
+		?>
+		
+	</head>
+	<body class="">
+		<?php //echo $this->masthead(); 
+		
+		$masthead->output();
+		
+		?>
+		<nav class="masthead-submenu" id="submenu">
+		<?php //echo $this->submenu() ?>
+		</nav>
+		<div id="main">
+		<?php /*if($this->_helper->flashMessenger()->hasMessages()){
+			?><div class="messages"><?php echo implode('<br>', $this->_helper->flashMessenger()->getMessages()); ?></div><?php
+		}*/?>
+		<?php echo $this->layout()->content; ?>
+		</div>
+		<?php $masthead->footer(); ?>
+		<?php include(realpath(APPLICATION_PATH . '/../../library').'/google-analytics.html'); ?>
+	</body>
+</html>

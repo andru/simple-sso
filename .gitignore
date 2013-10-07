@@ -1,4 +1,5 @@
-application/config/application.ini
+application/configs/application.ini
+application/configs/appkeys.ini
 private/*
 private/log/*
 private/session/*
