@@ -1,0 +1,5 @@
+application/config/application.ini
+private/*
+private/log/*
+private/session/*
+private/tmp/*
