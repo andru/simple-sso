@@ -9,11 +9,32 @@ class Application_Model_Integrations {
 		$settings = $bootstrap->getOptions();
 		$this->_cookieDomain = $settings['app']['cookiedomain'];
 		$this->persist = (isset($opts['persist']) && $opts['persist']===true) ? true : false;
-		$this->integrations = array(
-			new Application_Model_Integration_MediaWiki($this->_cookieDomain),
-			new Application_Model_Integration_Vanilla($this->_cookieDomain)
-		);
+
+		if(Zend_Registry::isRegistered('logger')){
+		  $this->logger = Zend_Registry::get('logger');
+		}
+		$conf = Zend_Registry::get('integrations');
+		//echo '<pre>'; print_r($conf->mediawiki->toArray()); exit;
+
+		$this->integrations = array();
+
+		if(isset($conf->mediawiki) && $conf->mediawiki->enabled){
+			$this->integrations[] = new Application_Model_Integration_MediaWiki($conf->mediawiki->toArray());
+		}
+		if(isset($conf->vanilla) && $conf->vanilla->enabled){
+			$this->integrations[] = new Application_Model_Integration_Vanilla($conf->vanilla->toArray());
+		}
+		/*if($conf->wordpress['enabled']===true){
+			$this->integrations[] = new Application_Model_Integration_Wordpress($conf['wordpress']);
+		}*/
 		
+
+	}
+	
+	protected function log($msg){
+    if($this->logger && $this->logger instanceof Zend_Log){
+      $this->logger->info($msg);
+    }
 	}
 	
 	public function onAuthenticate(){
@@ -27,6 +48,7 @@ class Application_Model_Integrations {
 	}
 	
 	public function onDestroySession(){
+		$this->log('onDestroySession, running integrations... ');
 		foreach($this->integrations as $i){
 			$i->onDestroySession();
 		}

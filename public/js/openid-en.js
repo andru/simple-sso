@@ -22,12 +22,12 @@ var providers_large = {
         url : 'http://openid.aol.com/{username}',
         sprite_offset: [0, 48]
     },*/
-    myopenid : {
+    /*myopenid : {
         name : 'MyOpenID',
         label : 'Enter your MyOpenID username.',
         url : 'http://{username}.myopenid.com/',
         sprite_offset: [0, 72]
-    },
+    },*/
     openid : {
         name : 'OpenID',
         label : 'Enter your OpenID.',
@@ -113,9 +113,10 @@ var providers_small = {
         url : 'http://www.google.com/profiles/{username}'
     } */
 };
-
-openid.locale = 'en';
-openid.sprite = 'en'; // reused in german& japan localization
-openid.demo_text = 'In client demo mode. Normally would have submitted OpenID:';
-openid.signin_text = 'Log in';
-openid.image_title = 'Log in with {provider}';
+$.ready(function(){
+    window.openid.locale = 'en';
+    window.openid.sprite = 'en'; // reused in german& japan localization
+    window.openid.demo_text = 'In client demo mode. Normally would have submitted OpenID:';
+    window.openid.signin_text = 'Log in';
+    window.openid.image_title = 'Log in with {provider}';
+});

@@ -1,5 +1,5 @@
 <?php 
-require_once(realpath(APPLICATION_PATH.'/../../').'/library/PasswordHash/PasswordHash.php');
+require_once(dirname(__FILE__).'/PasswordHash.lib.php');
 
 class PasswordHash_PasswordHash extends PasswordHash{
 

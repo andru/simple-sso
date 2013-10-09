@@ -80,7 +80,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
     }
     
     protected function _initMasthead(){
-    	require(realpath(APPLICATION_PATH.'/../../library').'/Masthead.php');
+    	require(realpath(APPLICATION_PATH.'/../../common').'/Layout.php');
     }
 
     protected function _initHelperPath() {
@@ -117,8 +117,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
      protected function _initAppKeysToRegistry() {
          $appkeys = new Zend_Config_Ini(APPLICATION_PATH . '/configs/appkeys.ini');
          Zend_Registry::set('keys', $appkeys);
-        
+     }
 
+    protected function _initIntegrationConfig() {
+         $conf = new Zend_Config_Ini(APPLICATION_PATH . '/configs/integrations.ini');
+         Zend_Registry::set('integrations', $conf);
      }
      
 	/*protected function _initConfig(){
@@ -150,13 +153,16 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
        $options = $this->getOptions();
 
        if(isset($options['email'])){
-         $config = array('auth' => 'login',
+        if(isset($options['email']['transport']) && $options['email']['transport']==='smtp'){
+            $config = array('auth' => 'login',
                       'username' => $options['email']['username'],
                       'password' => $options['email']['password']);
 
-         $tr = new Zend_Mail_Transport_Smtp($options['email']['server'], $config);
-
-         Zend_Mail::setDefaultTransport($tr);
+            $tr = new Zend_Mail_Transport_Smtp($options['email']['server'], $config);
+        }else{
+            $tr = new Zend_Mail_Transport_Sendmail();
+        }
+        Zend_Mail::setDefaultTransport($tr);
       }
      }
      
