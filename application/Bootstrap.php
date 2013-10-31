@@ -74,13 +74,21 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
     protected function _initView() {
         $view = new Zend_View();
         $viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('ViewRenderer');
-        $view->headTitle('Practical Plants SSO')->setSeparator(' - ');
+
+        $options = $this->getOptions();
+
+        $view->headTitle( $options['app']['name'] )->setSeparator(' - ');
         $viewRenderer->setView($view);
         return $view;
     }
     
     protected function _initMasthead(){
     	require(realpath(APPLICATION_PATH.'/../../common').'/Layout.php');
+    }
+
+    protected function _initSiteName(){
+        $options = $this->getOptions();
+        Zend_Registry::set('sitename', $options['app']['name'] );
     }
 
     protected function _initHelperPath() {

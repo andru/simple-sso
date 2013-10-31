@@ -55,7 +55,7 @@ class UserController extends Zend_Controller_Action {
     	$message = $this->getRequest()->getParam('message',null);
     	$this->view->form = $this->getLoginForm();
     	
-    	$this->log('Logging in...');
+    	//$this->log('Showing log in page');
     	
     	$authSess = new Zend_Session_Namespace('Auth');
     	if($redirect){
@@ -412,7 +412,8 @@ class UserController extends Zend_Controller_Action {
 	    	//check for local with matching email
 	    	if(!$user = $users->getUserBy('email',$values['email'])){
 	    		//no local user with matching email, create new local user
-	
+	            $sitename = Zend_Registry::get('sitename');
+
 	    		try{
 	    			//create new user 
 	    			$user = $users->createUser($values); 
@@ -422,15 +423,15 @@ class UserController extends Zend_Controller_Action {
                         $email = $user->email;
                         $email_to = $user->display_name ?: $user->username;
                         $password = $values['password'];
-                        $subject = $email_to.', you logged in to Practical Plants';
+                        $subject = $email_to.', you logged in to '.$sitename;
                         
-                        $html = '<h1>Hello '.$email_to.', thanks for logging in to Practical Plants</h1>' 
+                        $html = '<h1>Hello '.$email_to.', thanks for logging in to '.$sitename.'</h1>' 
                               . '<p>You logged in using '.$external['provider'].'</p>'
                               . '<p>Next time you log in, either use '.$external['provider'].', or you can login using the account details you just chose: </p>'
                               . '<blockquote><p>Email: '. $email .'</p>'
                               . '<p>Password: ' . $password . '</p></blockquote>'
                               . '<p>If you have any questions, drop by the <a href="http://practicalplants.org/community">Community Forums</a> or email us: hello@practicalplants.org</p>';
-                        $text = "Hello $email_to, thanks for logging in to Practical Plants\n"
+                        $text = "Hello $email_to, thanks for logging in to $sitename\n"
                                 . "You logged in using $external[provider].\n"
                                 . "Next time you log in, either use $external[provider], or you can login using the account details you just chose: \n"
                                 . "\tEmail: $email\n"

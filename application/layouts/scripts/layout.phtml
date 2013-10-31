@@ -1,5 +1,4 @@
 <?php 
-//$masthead = new PracticalPlants_Masthead();
 echo $this->doctype(); ?>
 <html>
 	<head>
@@ -28,20 +27,11 @@ echo $this->doctype(); ?>
 		
 	</head>
 	<body class="">
-		<?php //echo $this->masthead(); 
-		
-		//$masthead->output();
-		
-		?>
-		<nav class="masthead-submenu" id="submenu">
-		<?php //echo $this->submenu() ?>
-		</nav>
 		<div id="main">
 		<?php /*if($this->_helper->flashMessenger()->hasMessages()){
 			?><div class="messages"><?php echo implode('<br>', $this->_helper->flashMessenger()->getMessages()); ?></div><?php
 		}*/?>
 		<?php echo $this->layout()->content; ?>
 		</div>
-		<?php //$masthead->footer(); ?>
 	</body>
 </html>

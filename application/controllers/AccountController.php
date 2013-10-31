@@ -389,13 +389,15 @@ class AccountController extends Zend_Controller_Action
         
         $hash = substr(md5($user->register_time.$user->register_ip),10,5);
         
+        $sitename = Zend_Registry::get('sitename');
+
         //echo $hash;exit;
         $url = $this->_baseURL.'/activate/'.$user->user_id.'/'.$hash;
-        $html = '<h1>Your account at Practical Plants</h1>' 
+        $html = '<h1>Your account at '.$sitename.'</h1>' 
               . '<p><a href="'.$url.'">Click here</a> or enter this url into your browser to activate your account: '
               . $url.'</p>'
               . '<p>Your password is: ' . $password . '</p>';
-        $text = "Activate your account on Practical Plants here: "
+        $text = "Activate your account on '.$sitename.' here: "
               . $url." \n";
 
         //add password to activation email on initial registration - we can only do this when the form has just been
