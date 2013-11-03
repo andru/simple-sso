@@ -1,7 +1,9 @@
 <div class="result-message">
 
     <?php if ($this->identity): ?>
-        <h2>You are logged in as <?php echo $this->identity ?></h2
+        <h2>You are logged in as <?php echo $this->identity ?></h2>
+
+        <a href="/">Back to <?php echo $this->app_name ?></a>
         
         <h4><a href="<?php echo $this->url(array(),'logout'); ?>">Logout</a></h4>
         

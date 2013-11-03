@@ -78,6 +78,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
         $options = $this->getOptions();
 
         $view->headTitle( $options['app']['name'] )->setSeparator(' - ');
+        $view->assign('app_name', $options['app']['name']);
+        $view->assign('support_email', $options['app']['support_email']);
         $viewRenderer->setView($view);
         return $view;
     }
