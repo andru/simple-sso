@@ -16,6 +16,8 @@ class IndexController extends Zend_Controller_Action {
 //
 //        return;
 
+        $this->view->messages = $this->_helper->flashMessenger->getMessages();
+
         $auth = Zend_Auth::getInstance();
 		//print_r( $auth->getIdentity());
         if ($auth->hasIdentity()) {

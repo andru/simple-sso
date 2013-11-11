@@ -55,6 +55,13 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
         $router->addRoute('forgot-password-process',        
           new Zend_Controller_Router_Route('/forgot-password/process', array( 'controller' => 'account', 'action' => 'forgot-password-process'))
         );
+
+        $router->addRoute('reset-password',        
+          new Zend_Controller_Router_Route('/reset-password/:code', array( 'controller' => 'account', 'action' => 'reset-password'))
+        );
+        $router->addRoute('reset-password-process',        
+          new Zend_Controller_Router_Route('/reset-password/process', array( 'controller' => 'account', 'action' => 'reset-password-process'))
+        );
 		
 		$router->addRoute('integration-application',  			
 			new Zend_Controller_Router_Route('/integration/:application/:action', array( 'controller' => 'integration', 'action' => 'index'))
@@ -69,6 +76,10 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
     protected function _initDoctype() {
         $view = $this->bootstrap('view')->getResource('view');
         $view->doctype('HTML5');
+    }
+
+    protected function _initHasher(){
+        Zend_Registry::set('hasher', new PasswordHash_PasswordHash(8, true));
     }
     
     protected function _initView() {
@@ -96,7 +107,15 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
     protected function _initHelperPath() {
         $view = $this->bootstrap('view')->getResource('view');
         $view->setHelperPath(APPLICATION_PATH . '/views/helpers', 'My_View_Helper');
+
+        Zend_Controller_Action_HelperBroker::addPath(APPLICATION_PATH . '/controllers/helpers', 'Helper');
     }
+
+    protected function _initPlugins(){
+        $loader = new Zend_Loader_PluginLoader();
+        $loader->addPrefixPath('Validator', APPLICATION_PATH.'/forms/validators/');
+    }
+
     
     protected function _initApplicationAutoloading(){
     	$autoLoader = Zend_Loader_Autoloader::getInstance();

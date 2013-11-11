@@ -41,7 +41,16 @@ class AccountController extends Zend_Controller_Action
 		$bootstrap = $this->getInvokeArg('bootstrap'); 
 		 $options = $bootstrap->getOptions();
 		 $this->_baseURL = $options['app']['url'];
-	}	
+
+         $this->_flashMessenger = $this->_helper->getHelper('FlashMessenger');
+
+         //$this->initView();
+	}
+
+    public function postDispatch(){
+       // $this->view->messages = $this->_flashMessenger->getMessages();
+
+    }
 
     /**
      * Controller's entry point
@@ -257,36 +266,34 @@ class AccountController extends Zend_Controller_Action
      * @return void
      */
     public function forgotPasswordProcessAction() 
-    {
+    {   
         if( $this->getRequest()->isPost() ) {
-            $email = $this->getRequest()->getPost('email');
+            $email = $this->getRequest()->getPost('email');           
             
-            //recovery only active for three days
-            $date = date('YYYY-MM-DD');
-            $date = strtotime ( '+3 day' , strtotime ( $date ) ) ;
-            $date = date ( 'YYYY-MM-DD' , $date );
-            
-            $user = new Model_DbTable_Users();
-            $result = $user->emailExists($email);
-            if( $result != false ) {
-                $guid = uniqid();
-                $reset = new Model_DbTable_PasswordReset();
-                $result = $reset->insert( array( 'guid' => $guid, 'id' => $result, 'expiry_date' => $date ) );
-                if( !is_array($result) ) {
-                    $html = "<p>To reset your password, click <a href=\"".$this->_baseURL."/resetpass/id/$guid\">here</a>.</p>";
-                    $text = "Go to the following link to reset your password ".$this->_baseURL."/resetpass/id/$guid\n";
-                    sendMail($username, $email, $html, $text, 'Password Reset');
+            $users = new Application_Model_Users();
+            $user = $users->getUserBy('email', $email);
+
+            if( $user != false ) {
+                $code = $user->generatePasswordResetCode(7); //allow 7 days to reset password
+                if($code){
+                    $html = "<p>To reset your password, click <a href=\"".$this->_baseURL."/reset-password/code/$code\">here</a>.</p>";
+                    $text = "Go to the following link to reset your password ".$this->_baseURL."/reset-password/code/$code\n";
+                    $this->_helper->mailer($user->email, Zend_Registry::get('sitename').' Password Reset', $html, $text);
                     $session = new Zend_Session_Namespace();
                     $session->flashMessengerClass = 'flashMessagesGreen';
                     $this->_helper->flashMessenger->addMessage('An email has been sent to you with instructions on how to reset your password.');
-                } 
+                }else{
+                    $this->_helper->flashMessenger->addMessage('Something went wrong! Failed to generate a password reset code. Please try again.');
+                }
             } else { //return with error
                 $session = new Zend_Session_Namespace();
                 $session->flashMessengerClass = 'flashMessagesRed';
                 $this->_helper->flashMessenger->addMessage('We have no record of that email address.');
             }
+        }else{
+            $this->_helper->flashMessenger->addMessage('Invalid request.');
         }
-        $this->_redirect->gotoRoute(array(),'forgot-password');
+        $this->_redirect('/forgot-password');
     }
     
     /**
@@ -294,15 +301,22 @@ class AccountController extends Zend_Controller_Action
      *
      * @return void
      */
-    public function resetpassAction()
+    public function resetPasswordAction()
     {
-        if( strlen( ($this->getRequest()->getParam('id')) ) == 0 ) {//if password empty, return back
-            $this->_redirect('/login/forgotpassword/');
+        $code = $this->getRequest()->getParam('code');
+        if( strlen( $code ) == 0 ) {//if reset code empty, return back
+            $this->_forward('forgot-password');
         } else {//success changed password
             $this->view->messages = $this->_helper->flashMessenger->getMessages();
             $session = new Zend_Session_Namespace();
             $this->view->flashMessengerClass = $session->flashMessengerClass;
-            $this->view->guid = $this->getRequest()->getParam('id');
+            
+            $form = $this->getResetPasswordForm();
+            $form->code->setValue($code);
+            //print_r($form); exot
+            $this->view->form = $form;
+
+
         }
     }
     
@@ -311,66 +325,36 @@ class AccountController extends Zend_Controller_Action
      *
      * @return void
      */
-    public function resetpassprocessAction()
+    public function resetPasswordProcessAction()
     {
         if( $this->getRequest()->isPost() ) {
             $password = $this->getRequest()->getPost('password');
             $passwordConfirm = $this->getRequest()->getPost('passwordConfirm');
-            $guid = $this->getRequest()->getPost('guid');
             
-            //check valid password
-            $passwordLengthValidator = new Zend_Validate_StringLength(array('min' => MIN_PASS_CHAR, 'max' => MAX_PASS_CHAR));
-            $alNumValidator = new Zend_Validate_Alnum();
+            $form = $this->getResetPasswordForm();
+
             
-            $error = false;
-            if( strcmp($password, $passwordConfirm) != 0 ) {
-                $this->_helper->flashMessenger->addMessage('Your passwords do not match.');
-                $error = true;
-            }
-            if( !$passwordLengthValidator->isValid($password) ) {
-            
-                if( !$alNumValidator->isValid($password) ) {
-                    $this->_helper->flashMessenger->addMessage('You password must only consist of letters and numbers.');
-                    $error = true;
-                } else {
-                    $this->_helper->flashMessenger->addMessage('Passwords must be between ' . MIN_PASS_CHAR . ' and ' . MAX_CHAR_PASS . ' characters in length.');
-                    $error = true;
-                }
-            }
-            
-            //if validation errors, store data in view
-            if($error) {
-                $session = new Zend_Session_Namespace();
-                $session->flashMessengerClass = 'flashMessagesRed';
-                $session->guid = $guid;
-                $this->_redirect('/login/resetpass/id/' . $guid . '/');
+            if(!$form->isValid($this->getRequest()->getPost())){
+                $this->view->form = $form; //$form->setValues($this->getRequest()->getPost());
+                $this->render('reset-password');
             } else {
+                $code = $form->code->getValue();
+
                 //register use and redirect to success page
                 $options= $this->getInvokeArg('bootstrap')->getOptions();
-                $salt = $options['password']['salt'];
-                $user = new Model_DbTable_Users();
-                $passwordReset = new Model_DbTable_PasswordReset();
-                $id = $passwordReset->getID($guid);
-                $result = $user->changePassword($id, sha1($password . $salt));
-                $username = $user->getUsername($id);
-                $email = $user->getEmail($id);
-                if( $result != null ) {
-                    $passwordReset->delete($passwordReset->getAdapter()->quoteInto('guid = ?', $guid));
-                    //send email with username and password.
-                    $html = '<p>Your new login information is below:</p>'
-                          . '<p>Username: ' . $username . '</p>'
-                          . '<p>Password: ' . $password . '</p>';
-                    $text = "Your new login information is below:\n"
-                          . "Username: $username . \nPassword: $password \n";
-                    $this->sendMail($username, $email, $html, $text, 'Account Information');
+                $users = new Application_Model_Users();
+                $user = $users->getUserByPasswordResetCode($code);
+
+                if( $user ) {
+                    $user->resetPassword($password);
                     $session = new Zend_Session_Namespace();
                     $session->flashMessengerClass = 'flashMessagesGreen';
                     $this->_helper->flashMessenger->addMessage('Your password has been successfully reset.');
-                    $this->_redirect('/login/index/');
+                    $this->_redirect('/index/');
                 } else {
                     $session = new Zend_Session_Namespace();
                     $session->flashMessengerClass = 'flashMessagesRed';
-                    $this->_helper->flashMessenger->addMessage('Your password could not be reset.');
+                    $this->_helper->flashMessenger->addMessage('The link you followed has expired. Please try resetting your password again.');
                     $this->_helper->redirector->gotoRoute(array(),'forgot-password');
                 }
             }
@@ -434,6 +418,13 @@ class AccountController extends Zend_Controller_Action
     protected function getRegisterForm() {
         return new Application_Form_Register(array(
             'action' => '/sso/registration',
+            'method' => 'post'
+        ));
+    }
+
+    protected function getResetPasswordForm(){
+         return new Application_Form_ResetPassword(array(
+            'action' => '/sso/reset-password/process',
             'method' => 'post'
         ));
     }

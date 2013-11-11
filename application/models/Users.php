@@ -26,6 +26,9 @@ class Application_Model_Users extends Zend_Db_Table_Abstract {
             case 'email':
             	$field = 'email';
             	break;
+            case 'password-reset-code':
+                return $this->getUserByPasswordResetCode($value);
+                break;
             default:
                 return false;
         }
@@ -33,7 +36,11 @@ class Application_Model_Users extends Zend_Db_Table_Abstract {
         if (!$user = $this->fetchRow($this->select()->where($field.' = ?', $value)) )
             return false;
  		
-        return $user;
+        return new Application_Model_User($user);
+    }
+
+    public function emailExists($email){
+        return !!( $this->getUserBy('email', $email) );
     }
     
     public function getUserByAuthIdentity($provider,$identity){
@@ -44,6 +51,15 @@ class Application_Model_Users extends Zend_Db_Table_Abstract {
     		}
     	}
     	return false;
+    }
+
+    public function getUserByPasswordResetCode($code){
+        $table = new Application_Model_User_PasswordResets();
+        $row = $table->getByCode($code);
+        if($row){
+            return $this->getUserBy('id', $row->user_id);
+        }
+        return false;
     }
     
     public function createUser($props){
@@ -158,9 +174,6 @@ class Application_Model_Users extends Zend_Db_Table_Abstract {
      * @return Webjawns_PasswordHash PHPass
      */
     public function hasher() {
-        if (!Zend_Registry::isRegistered('hasher')) {
-            Zend_Registry::set('hasher', new PasswordHash_PasswordHash(8, true));
-        }
         return Zend_Registry::get('hasher');
     }
    
