@@ -235,7 +235,7 @@ class AccountController extends Zend_Controller_Action
                 if($user->email_confirmed){
                     $form->addError('Your account has already been activated.');
                 }else{
-                   $this->sendActivationEmail($user);
+                    $this->sendActivationEmail($user);
                     return $this->render('resent-activation'); 
                 }
             }else{
@@ -364,10 +364,10 @@ class AccountController extends Zend_Controller_Action
     }
 
 
-    protected function sendActivationEmail(Zend_Db_Table_Row $user, $password = null){
+    protected function sendActivationEmail($user, $password = null){
         //$username = $form->getProperty('username');
-        if(!isset($user->email))
-            throw 'Invalid user object for sendActivationEmail';
+        if(!$user->email)
+            throw new Exception('Invalid user object for sendActivationEmail');
         $email = $user->email;
         $email_to = $user->display_name ?: $user->username;
         
