@@ -130,7 +130,7 @@ class AccountController extends Zend_Controller_Action
           	//print_r((array) $user->toArray());exit;
             
             if($user){
-            	$this->sendActivationEmail($user);
+            	$this->sendActivationEmail($user, $form->getValue('password'));
             	
             	//return $this->_redirect()->gotoRoute(array(),'registered');
             	return $this->_forward('registered');
@@ -395,14 +395,14 @@ class AccountController extends Zend_Controller_Action
         $url = $this->_baseURL.'/activate/'.$user->user_id.'/'.$hash;
         $html = '<h1>Your account at '.$sitename.'</h1>' 
               . '<p><a href="'.$url.'">Click here</a> or enter this url into your browser to activate your account: '
-              . $url.'</p>'
-              . '<p>Your password is: ' . $password . '</p>';
+              . $url.'</p>';
         $text = "Activate your account on '.$sitename.' here: "
               . $url." \n";
 
         //add password to activation email on initial registration - we can only do this when the form has just been
         //submitted. After that it's cryped.
         if($password!==null){
+            $html.=- '<p>Your password is: ' . $password . '</p>';
             $text .= "Your password is: $password\n";
         }
 
