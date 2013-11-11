@@ -31,9 +31,13 @@ class Application_Model_Integration_Vanilla {
 	
 	public function deleteCookies(){
 		$this->log("Deleting Vanilla cookies from domain ".$this->_cookieDomain);
-		setcookie('Vanilla', false, 315554400, '/',$this->_cookieDomain);
-		setcookie('Vanilla-Volatile', false, 315554400, '/',$this->_cookieDomain);
-		setcookie('VanillaProxy', false, 315554400, '/',$this->_cookieDomain);
-		setcookie('Vanilla-Vv', false, 315554400, '/',$this->_cookieDomain);
+		setcookie('Vanilla', false, -1, '/',$this->_cookieDomain);
+		setcookie('Vanilla-Volatile', false, -1, '/',$this->_cookieDomain);
+		setcookie('VanillaProxy', false, -1, '/',$this->_cookieDomain);
+		setcookie('Vanilla-Vv', false, -1, '/',$this->_cookieDomain);
+		setcookie('Vanilla', false, -1, '/');
+		setcookie('Vanilla-Volatile', false, -1, '/');
+		setcookie('VanillaProxy', false, -1, '/');
+		setcookie('Vanilla-Vv', false, -1, '/');
 	}	
 }
