@@ -276,8 +276,8 @@ class AccountController extends Zend_Controller_Action
             if( $user != false ) {
                 $code = $user->generatePasswordResetCode(7); //allow 7 days to reset password
                 if($code){
-                    $html = "<p>To reset your password, click <a href=\"".$this->_baseURL."/reset-password/code/$code\">here</a>.</p>";
-                    $text = "Go to the following link to reset your password ".$this->_baseURL."/reset-password/code/$code\n";
+                    $html = "<p>To reset your password, click <a href=\"".$this->_baseURL."/reset-password/$code\">here</a>.</p>";
+                    $text = "Go to the following link to reset your password ".$this->_baseURL."/reset-password/$code\n";
                     $this->_helper->mailer($user->email, Zend_Registry::get('sitename').' Password Reset', $html, $text);
                     $session = new Zend_Session_Namespace();
                     $session->flashMessengerClass = 'flashMessagesGreen';
