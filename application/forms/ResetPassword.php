@@ -12,7 +12,7 @@ class Application_Form_ResetPassword extends Zend_Form {
         $password = $this->addElement('password', 'password', array(
             'filters' => array('StringTrim'),
             'validators' => array( 
-                array('StringLength', false, array(5, 20)),
+                array('StringLength', false, array(5, 250)),
             ),
             'required' => true,
             'label' => 'New Password',
@@ -21,7 +21,7 @@ class Application_Form_ResetPassword extends Zend_Form {
         $password_conf = $this->addElement('password', 'passwordconf', array(
             'filters' => array('StringTrim'),
             'validators' => array( 
-                array('StringLength', false, array(5, 20))
+                array('StringLength', false, array(5, 250))
             ),
             'required' => true,
             'label' => 'Re-type Password',

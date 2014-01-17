@@ -18,25 +18,27 @@ class Application_Form_RegisterFromExternal extends Zend_Form {
     	
         $username = $this->addElement('text', 'username', array(
             'filters' => array('StringTrim', 'StringToLower'),
-            'validators' => array('Alnum', array('StringLength', false, array(3, 20))),
+            'validators' => array( array('StringLength', false, array(3, 250))),
             'required' => true,
             'label' => 'Username',
         ));
         
         $password = $this->addElement('password', 'password', array(
             'filters' => array('StringTrim'),
-            'validators' => array( array('StringLength', false, array(5, 20))),
+            'validators' => array( array('StringLength', false, array(5, 250))),
             'required' => true,
             'label' => 'Password',
         ));
  		
  		$login = $this->addElement('text', 'display_name', array(
+            'filters' => array('StringTrim'),
  		    'required' => false,
  		    'ignore' => false,
  		    'label' => 'Real name',
  		));
  		
         $login = $this->addElement('submit', 'login', array(
+            'filters' => array('StringTrim'),
             'required' => false,
             'ignore' => true,
             'label' => 'Register',

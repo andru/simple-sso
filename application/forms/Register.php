@@ -17,26 +17,20 @@ class Application_Form_Register extends Zend_Form {
     
         $username = $this->addElement('text', 'username', array(
             'filters' => array('StringTrim', 'StringToLower'),
-            'validators' => array('Alnum', array('StringLength', false, array(3, 20))),
+            'validators' => array(array('StringLength', false, array(3, 250))),
             'required' => true,
             'label' => 'Username',
         ));
         
         $password = $this->addElement('password', 'password', array(
             'filters' => array('StringTrim'),
-            'validators' => array( array('StringLength', false, array(5, 20))),
+            'validators' => array( array('StringLength', false, array(5, 250))),
             'required' => true,
             'label' => 'Password',
         ));
-        
-        /*$password_conf = $this->addElement('password', 'password-conf', array(
-            'filters' => array('StringTrim'),
-            'validators' => array( array('StringLength', false, array(5, 20))),
-            'required' => true,
-            'label' => 'Re-type Password',
-        ));*/
  		
  		$login = $this->addElement('text', 'display_name', array(
+            'filters' => array('StringTrim'),
  		    'required' => false,
  		    'ignore' => false,
  		    'label' => 'Real name',
